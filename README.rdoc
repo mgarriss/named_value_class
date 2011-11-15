@@ -18,14 +18,19 @@ The following are basic examples ({see these examples here...}[http://github.com
   require "named_value_class"
 
 Create a new class named MathFloat that delegates to Float and one named
-Note that delegates to Fixnum.
+Note that delegates to Fixnum.  The Note class has a new instance method
+add called #play_midi.
 
   module MyApp
     NamedValueClass 'MathFloat', Float
-    NamedValueClass 'Note', Fixnum
+    NamedValueClass 'Note', Fixnum do
+      def play_midi
+        # do something interesting here
+      end
+    end
   end
 
-Create two MathFloat constants and one Note constants.  
+Create two MathFloat constants and one Note constant.  
 
   module MyApp
     MathFloat 'Pi',  3.14159265358979323846
