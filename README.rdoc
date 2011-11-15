@@ -1,0 +1,79 @@
+= NamedValueClass
+
+Quickly add class delegate constants which string output their names, not
+their values.  This may be desirable for some DSLs.
+
+== Installation
+
+  gem install named_value_class
+  
+== Requirements
+
+Currently only tested with Ruby 1.9.2-p290.
+
+== Usage
+
+The following are basic examples ({see these examples here...}[http://github.com/mgarriss/named_value_class/blob/master/examples/])
+
+  require "named_value_class"
+
+Create a new class named MathFloat that delegates to Float and one named
+Note that delegates to Fixnum.
+
+  module MyApp
+    NamedValueClass 'MathFloat', Float
+    NamedValueClass 'Note', Fixnum
+  end
+
+Create two MathFloat constants and one Note constants.  
+
+  module MyApp
+    MathFloat 'Pi',  3.14159265358979323846
+    MathFloat 'Phi', 1.61803398874989
+    
+    Note 'A4', 440 # Hertz
+  end
+
+Access the constants.
+
+  MyApp::MathFloat::Pi + MyApp:MathFloat::Phi
+
+All constants created in the above way can be included anywhere using the
+NamedValues module defined within the new class create by NamedValueClass().
+
+  include MyApp::MathFloat::NamedValues
+
+The following output the constant's name and not the underlying value.
+
+  Pi                #=> Pi
+  Phi               #=> Phi
+
+The following output a value because the results are regular Floats.
+
+  Pi / 2            #=> 1.5707963267948966
+  Phi / 2           #=> 0.809016994374945
+  Pi + Phi          #=> 4.759626642339683
+
+Just showing constant names here, note that this output is eval'able.
+
+  [Pi, Phi]         #=> [Pi, Phi]
+
+We can still get the original inspect and to_s methods.
+
+  Phi.value_inspect #=> "1.61803398874989"
+  Phi.value_to_s    #=> "1.61803398874989"
+  
+Get access to an Array of all created constants like so.
+
+  MyApp::Note::NamedValues::Collection  #=> [A4]
+  
+  
+== Author
+
+* {Michael Garriss}[http://github.com/mgarriss] <mgarriss at gmail.com>
+
+== License
+
+Apache 2.0, See the file LICENSE
+
+Copyright (c) 2011 Michael Garriss

@@ -1,3 +1,0 @@
-Quickly add class delegate constants which output their names, not their values.  This may be desirable for some DSLs.
-
-See /examples
