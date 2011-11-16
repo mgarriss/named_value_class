@@ -75,7 +75,26 @@ Get access to an Array of all created constants like so.
 Call added instance methods.
 
   MyApp::Note::A4.play_midi
+
+Everything works at the global scope.
+
+  NamedValueClass 'Baz', Array
   
+  Baz 'B1', [1,2]
+
+Additional attribues can be added to any instance.
+
+  Baz 'B2', [],    param_a:'dude2'
+  Baz 'B3', [2,1], param_b:58
+  Baz 'B4', [2,1], param_c:'YA'
+  
+All instances will have setters and getters for any named parameter given.
+
+  Baz::B2.param_a                    #=> 'dude2'
+  Baz::B2.param_a = 'kind of cool'
+  Baz::B2.param_a                    #=> 'kind of cool'
+
+
 == Author
 
 * {Michael Garriss}[http://github.com/mgarriss] <mgarriss at gmail.com>

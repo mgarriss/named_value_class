@@ -1,15 +1,22 @@
 require 'delegate'
 
-def NamedValueClass(klass_name,superclass,&block)
+def NamedValueClass(klass_name,superclass, &block)
   target = (self.class == Object ? Kernel : self)
   
   target.module_eval "class #{klass_name} < DelegateClass(superclass); end"
   klass = target.const_get(klass_name)  
   
   klass.module_eval do
-    def initialize(name,value)
+    def initialize(name,value,attrs = {})
       @name = name.to_s
       super(value)
+      
+      attrs.each do |(attr,val)|
+        self.class.instance_eval do
+          attr_accessor attr
+        end
+        instance_variable_set "@#{attr}", val 
+      end
       
       # THINK is this making it harder than it needs to be?
       named_values_module = self.class.const_get('NamedValues')
@@ -44,8 +51,8 @@ def NamedValueClass(klass_name,superclass,&block)
     end
   EVAL
   
-  define_singleton_method klass_name do |name,value| 
-    klass.const_get(name) rescue klass.new(name,value)
+  define_singleton_method klass_name do |name,value,attrs={}| 
+    klass.const_get(name) rescue klass.new(name,value,attrs)
   end
   
   klass

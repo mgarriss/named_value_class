@@ -148,3 +148,42 @@ describe 'NamedValueClass' do
     end
   end
 end
+
+NamedValueClass 'Baz', Array
+
+Baz 'B1', [1,2], param_a:'dude', param_b:5
+Baz 'B2', [],    param_a:'dude2'
+Baz 'B3', [2,1], param_b:58
+Baz 'B4', [2,1], param_c:'YA'
+
+describe 'NamedValueClass additional attributes' do
+  it 'is accessable from any instance' do
+    Baz::B1.param_a.must_equal 'dude'
+    Baz::B1.param_b.must_equal 5
+    Baz::B1.param_c.must_be_nil
+    
+    Baz::B2.param_a.must_equal 'dude2'
+    Baz::B2.param_b.must_be_nil
+    Baz::B2.param_c.must_be_nil
+    
+    Baz::B3.param_a.must_be_nil
+    Baz::B3.param_b.must_equal 58
+    
+    Baz::B4.param_a.must_be_nil
+    Baz::B4.param_b.must_be_nil
+    Baz::B4.param_c.must_equal 'YA'
+  end
+  
+  it 'acts like an Array' do
+    Baz::B1[0].must_equal 1
+    Baz::B1[1].must_equal 2
+    
+    Baz::B2[0].must_be_nil
+    Baz::B2[1].must_be_nil
+  end
+  
+  it 'has a working setter' do
+    Baz::B3.param_c = 45
+    Baz::B3.param_c.must_equal 45
+  end
+end
