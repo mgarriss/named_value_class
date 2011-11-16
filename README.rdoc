@@ -84,15 +84,15 @@ Everything works at the global scope.
 
 Additional attribues can be added to any instance.
 
-  Baz 'B2', [],    param_a:'dude2'
-  Baz 'B3', [2,1], param_b:58
-  Baz 'B4', [2,1], param_c:'YA'
+  Baz 'B2', [],    some_param:'dude2', foo:5, bar:89
+  Baz 'B3', [2,1], foo:99
+  Baz 'B4', [2,1], bar:9.3
   
 All instances will have setters and getters for any named parameter given.
 
-  Baz::B2.param_a                    #=> 'dude2'
-  Baz::B2.param_a = 'kind of cool'
-  Baz::B2.param_a                    #=> 'kind of cool'
+  Baz::B2.some_param                    #=> 'dude2'
+  Baz::B2.some_param = 'kind of cool'
+  Baz::B2.some_param                    #=> 'kind of cool'
 
 
 == Author
