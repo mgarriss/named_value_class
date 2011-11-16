@@ -133,8 +133,8 @@ have distinct meanings:
     DorianMode = [P1,M2,m3,P4,P5,M6,m7]
   end
 
-You get the idea. Your homework: Scale should be a NamedValueClass. Scale:A
-and Scale Am, etc.  
+You get the idea. Your homework: Scale should be a NamedValueClass. Scale::A
+and Scale::Am, etc.  
   
 
 == Author
