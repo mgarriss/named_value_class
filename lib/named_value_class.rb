@@ -18,11 +18,26 @@ def NamedValueClass(klass_name,superclass, &block)
         instance_variable_set "@#{attr}", val 
       end
       
-      # THINK is this making it harder than it needs to be?
       named_values_module = self.class.const_get('NamedValues')
       named_values_collection = named_values_module.const_get('Collection')
-      self.class.const_set(@name, self)
-      named_values_module.const_set(@name, self)
+      begin
+        self.class.const_set(@name, self)
+        named_values_module.const_set(@name, self)
+      rescue NameError
+        name_error_name = "NameError_#{@name}"
+        self.class.const_set(name_error_name, self)
+        named_values_module.const_set(name_error_name, self)
+        self.class.class_eval <<-EVAL
+          def self.#{@name}()
+            #{name_error_name}
+          end
+        EVAL
+        named_values_module.module_eval <<-EVAL
+          def self.#{@name}()
+            #{name_error_name}
+          end
+        EVAL
+      end
       named_values_collection << self
     end
     

@@ -12,6 +12,8 @@ module Test
   Foo 'F2', 2
   Foo 'F1', 3 # won't be reset to 3 because F1 is already set to 1
   
+  Foo 'ff', 36 # lower case constant
+  
   class Bar
     include Foo::NamedValues
   end
@@ -26,6 +28,8 @@ end
 Foo 'F1', 4
 Foo 'F2', 5
 Foo 'F1', 6 # won't be reset to 6 because F1 is already set to 4
+
+Foo 'ff', 56 # lower case constant
 
 class Bar
   include Foo::NamedValues
@@ -49,6 +53,12 @@ describe 'NamedValueClass' do
     it 'sets F2' do
       Test::Foo::F2.must_equal 2
       Foo::F2.must_equal 5
+      Foo::F2.must_equal 5
+    end
+    
+    it 'set ff' do
+      Test::Foo::ff.must_equal 36
+      Foo::ff.must_equal 56
     end
     
     describe '#foo' do
@@ -127,8 +137,8 @@ describe 'NamedValueClass' do
     end
     
     it 'has size 2' do
-      Test::Foo::NamedValues::Collection.size.must_equal 2
-      Foo::NamedValues::Collection.size.must_equal 2
+      Test::Foo::NamedValues::Collection.size.must_equal 3
+      Foo::NamedValues::Collection.size.must_equal 3
     end
     
     it 'includes F1' do
@@ -145,6 +155,19 @@ describe 'NamedValueClass' do
       
       Test::Foo::NamedValues::Collection.wont_include Foo::F2
       Foo::NamedValues::Collection.wont_include Test::Foo::F2
+    end
+    
+    it 'includes ff' do
+      Test::Foo::NamedValues::Collection.must_include Test::Foo::ff
+      Foo::NamedValues::Collection.must_include Foo::ff
+      
+      Test::Foo::NamedValues::Collection.wont_include Foo::ff
+      Foo::NamedValues::Collection.wont_include Test::Foo::ff
+    end
+    
+    it 'provides ff in Foo and in Foo::NamedValues' do
+      Test::Foo::NamedValues::ff.must_equal Test::Foo::ff
+      Foo::NamedValues::ff.must_equal Foo::ff
     end
   end
 end

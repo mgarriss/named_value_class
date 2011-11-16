@@ -3,6 +3,14 @@
 Quickly add class delegate constants which string output their names, not
 their values.  This may be desirable for some DSLs.
 
+== Features
+
+* Creates a customized class for constants that delegate most work to the stable and efficient ruby core classes.
+* #to_s and #inspect output is the constant's name and not it's value.
+* Output is eval'able.
+* Allows for lowercase constant names.
+* Provides a module for each new class to include all defined values into some other namespace.
+
 == Installation
 
   gem install named_value_class
@@ -53,11 +61,16 @@ The following output the constant's name and not the underlying value.
   Pi                #=> Pi
   Phi               #=> Phi
 
-The following output a value because the results are regular Floats.
+Treat the defined value as the type they delegate to.  The following output a value because the results are regular Floats.
 
   Pi / 2            #=> 1.5707963267948966
   Phi / 2           #=> 0.809016994374945
   Pi + Phi          #=> 4.759626642339683
+  
+Use them on left hand or right hand side.
+
+  3 / Pi            #=> 0.954929658551372
+  2 / Phi           #=> 1.2360679774997934
 
 Just showing constant names here, note that this output is eval'able.
 
@@ -94,6 +107,35 @@ All instances will have setters and getters for any named parameter given.
   Baz::B2.some_param = 'kind of cool'
   Baz::B2.some_param                    #=> 'kind of cool'
 
+Use lowercase names.  Before you complain, please consider the standard
+abbreviations for the Diatonic Interval names in music theory.  'm' and 'M'
+have distinct meanings:
+
+  module Music
+    NamedValueClass 'Interval', Fixnum
+
+    Interval 'P1', 0   # value is number of semitones
+    Interval 'm2', 1
+    Interval 'M2', 2
+    Interval 'm3', 3
+    Interval 'M3', 4
+    Interval 'P4', 5
+    Interval 'A4', 6
+    Interval 'd5', 6
+    Interval 'P5', 7
+    Interval 'm6', 8
+    Interval 'M6', 9
+    Interval 'm7', 10
+    Interval 'M7', 11
+    Interval 'P8', 12
+  
+    MinorScale = [P1,M2,m3,P4,P5,m6,m7]
+    DorianMode = [P1,M2,m3,P4,P5,M6,m7]
+  end
+
+You get the idea. Your homework: Scale should be a NamedValueClass. Scale:A
+and Scale Am, etc.  
+  
 
 == Author
 
