@@ -112,6 +112,20 @@ describe 'NamedValueClass' do
         Foo::F2.value_inspect.must_equal '5'
       end
     end
+    
+    describe '.[]' do
+      it 'returns the constant with the given value' do
+        Test::Foo[1].to_s.must_equal 'F1'
+        Test::Foo[1].must_equal 1
+        Test::Foo[2].to_s.must_equal 'F2'
+        Test::Foo[2].must_equal 2
+        
+        Foo[4].to_s.must_equal 'F1'
+        Foo[4].must_equal 4
+        Foo[5].to_s.must_equal 'F2'
+        Foo[5].must_equal 5
+      end
+    end
   end
   
   describe Bar do

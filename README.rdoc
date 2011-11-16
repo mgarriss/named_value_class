@@ -10,6 +10,7 @@ their values.  This may be desirable for some DSLs.
 * Output is eval'able.
 * Allows for lowercase constant names.
 * Provides a module for each new class to include all defined values into some other namespace.
+* Provides a mapping from value back to constant.
 
 == Installation
 
@@ -128,14 +129,22 @@ have distinct meanings:
     Interval 'm7', 10
     Interval 'M7', 11
     Interval 'P8', 12
+  end
   
+  class Scale
+    include Music::Interval::NamedValues
+    extend  Music::Interval::NamedValues  # this sucks, still working in this 
+
     MinorScale = [P1,M2,m3,P4,P5,m6,m7]
     DorianMode = [P1,M2,m3,P4,P5,M6,m7]
   end
+  
+A mapping from values back to named values is provided using [].
+
+  Music::Interval[3] #=> m3
 
 You get the idea. Your homework: Scale should be a NamedValueClass. Scale::A
 and Scale::Am, etc.  
-  
 
 == Author
 

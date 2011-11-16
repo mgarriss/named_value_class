@@ -36,8 +36,18 @@ def NamedValueClass(klass_name,superclass, &block)
           def self.#{@name}()
             #{name_error_name}
           end
+          def #{@name}()
+            #{name_error_name}
+          end
         EVAL
       end
+      
+      this = self
+      self.class.singleton_class.instance_eval do
+        @mapping ||= {}
+        @mapping[value] = this
+      end
+      
       named_values_collection << self
     end
     
@@ -55,6 +65,12 @@ def NamedValueClass(klass_name,superclass, &block)
     
     def value_inspect # :nodoc:
       method_missing :inspect
+    end
+    
+    def self.[](value)
+      singleton_class.instance_eval do
+        @mapping[value]
+      end
     end
     
     class_eval(&block) if block
