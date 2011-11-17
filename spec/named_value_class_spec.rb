@@ -27,6 +27,7 @@ end
 
 Foo 'F1', 4
 Foo 'F2', 5
+Foo 'F3', 5
 Foo 'F1', 6 # won't be reset to 6 because F1 is already set to 4
 
 Foo 'ff', 56 # lower case constant
@@ -165,6 +166,9 @@ describe 'NamedValueClass' do
         
         Foo[4].to_s.must_equal 'F1'
         Foo[4].must_equal 4
+      end
+      
+      it 'returns the first mapping set, not the last' do
         Foo[5].to_s.must_equal 'F2'
         Foo[5].must_equal 5
       end
@@ -195,7 +199,7 @@ describe 'NamedValueClass' do
     
     it 'has size 2' do
       Test::Foo::NamedValues::Collection.size.must_equal 3
-      Foo::NamedValues::Collection.size.must_equal 3
+      Foo::NamedValues::Collection.size.must_equal 4
     end
     
     it 'includes F1' do

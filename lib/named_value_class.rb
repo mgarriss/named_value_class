@@ -49,7 +49,7 @@ def NamedValueClass(klass_name,superclass, &block)
       this = self
       self.class.singleton_class.instance_eval do
         @mapping ||= {}
-        @mapping[value] = this
+        @mapping[value] = this unless @mapping[value]
       end
       
       named_values_collection << self
