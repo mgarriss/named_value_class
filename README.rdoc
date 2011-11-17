@@ -146,6 +146,11 @@ A mapping from values back to named values is provided using [].
 You get the idea. Your homework: Scale should be a NamedValueClass. Scale::A
 and Scale::Am, etc.  
 
+== Issues
+
+* One must both include and extend NamedValues in order to get lowercase instances.
+* If you run into this error: "super from singleton method that is defined to multiple classes is not supported; this will be fixed in 1.9.3 or later" try declaring instances directly after the NamedValueClass call for each new type.  I'm still trying to track down a solution to this (unless 1.9.3 beats me).
+
 == Author
 
 * {Michael Garriss}[http://github.com/mgarriss] <mgarriss at gmail.com>

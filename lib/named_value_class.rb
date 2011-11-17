@@ -25,21 +25,25 @@ def NamedValueClass(klass_name,superclass, &block)
         named_values_module.const_set(@name, self)
       rescue NameError
         name_error_name = "NameError_#{@name}"
-        self.class.const_set(name_error_name, self)
-        named_values_module.const_set(name_error_name, self)
-        self.class.class_eval <<-EVAL
-          def self.#{@name}()
-            #{name_error_name}
-          end
-        EVAL
-        named_values_module.module_eval <<-EVAL
-          def self.#{@name}()
-            #{name_error_name}
-          end
-          def #{@name}()
-            #{name_error_name}
-          end
-        EVAL
+        begin
+          self.class.const_get(name_error_name)
+        rescue NameError
+          self.class.const_set(name_error_name, self)
+          named_values_module.const_set(name_error_name, self)
+          self.class.class_eval <<-EVAL
+            def self.#{@name}()
+              #{name_error_name}
+            end
+          EVAL
+          named_values_module.module_eval <<-EVAL
+            def self.#{@name}()
+              #{name_error_name}
+            end
+            def #{@name}()
+              #{name_error_name}
+            end
+          EVAL
+        end
       end
       
       this = self
@@ -83,7 +87,11 @@ def NamedValueClass(klass_name,superclass, &block)
   EVAL
   
   define_singleton_method klass_name do |name,value,attrs={}| 
-    klass.const_get(name) rescue klass.new(name,value,attrs)
+    begin
+      klass.const_get(name) || klass.const_get("NameError_#{name}")
+    rescue NameError #=> e
+      klass.new(name,value,attrs)
+    end
   end
   
   klass

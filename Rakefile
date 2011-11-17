@@ -16,11 +16,11 @@ task :build do
 end
  
 task :local => :build do
-  system "gem install named_value_class-0.4.0.gem"
+  system "gem install named_value_class-0.4.1.gem"
 end
 
 task :release => :build do
-  system "gem push named_value_class-0.4.0.gem"
+  system "gem push named_value_class-0.4.1.gem"
 end
 
 task :default => [:test]

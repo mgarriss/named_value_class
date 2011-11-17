@@ -33,7 +33,50 @@ Foo 'ff', 56 # lower case constant
 
 class Bar
   include Foo::NamedValues
+  extend  Foo::NamedValues
 end
+
+module Music
+  NamedValueClass 'Interval', Fixnum
+
+  Interval 'P1', 0   # value is number of semitones
+  Interval 'm2', 1
+  Interval 'M2', 2
+  Interval 'm3', 3
+  Interval 'M3', 4
+  Interval 'P4', 5
+  Interval 'A4', 6
+  Interval 'd5', 6
+  Interval 'P5', 7
+  Interval 'm6', 8
+  Interval 'M6', 9
+  Interval 'm7', 10
+  Interval 'M7', 11
+  Interval 'P8', 12
+end
+
+class Scale
+  include Music::Interval::NamedValues
+  extend  Music::Interval::NamedValues  # this sucks, still working in this 
+
+  MinorScale = [P1,M2,m3,P4,P5,m6,m7]
+  DorianMode = [P1,M2,m3,P4,P5,M6,m7]
+end
+
+module Inner
+  NamedValueClass 'A', Fixnum
+  A 'A1', 1
+  A 'A2', 2
+  NamedValueClass 'B', Fixnum
+  B 'B1', 3
+  B 'B2', 4
+end
+
+NamedValueClass 'C', Fixnum 
+2.times do
+  C 'c', :c
+end
+
 
 describe 'NamedValueClass' do
   describe Foo do
