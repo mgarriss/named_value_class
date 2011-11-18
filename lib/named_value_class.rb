@@ -1,6 +1,9 @@
 require 'delegate'
 
-def NamedValueClass(klass_name,superclass,&block)
+# see README for documention
+def NamedValueClass(attrs={},&block)
+  klass_name, superclass = attrs.first
+  attrs.delete(klass_name)
   target = (self.class == Object ? Kernel : self)
   
   target.module_eval "class #{klass_name} < DelegateClass(superclass); end"
@@ -9,11 +12,12 @@ def NamedValueClass(klass_name,superclass,&block)
   klass.module_eval do
     def self.inherited(child)
       super
-      code = proc do |name,value,attrs={}|
+      code = proc do |attrs={}|
+        name, value = attrs.first
         begin
           const_get(name) || const_get("NameError_#{name}")
         rescue NameError #=> e
-          child.new(name,value,attrs)
+          child.new(attrs)
         end
       end
       if (mod = const_get(self.to_s.sub(/::.+$/,''))) == Kernel
@@ -31,8 +35,10 @@ def NamedValueClass(klass_name,superclass,&block)
       end
     end
   
-    def initialize(name,value,attrs = {})
-      @name = name.to_s
+    def initialize(attrs = {})
+      @name, value = attrs.first
+      attrs.delete(@name)
+      @name = @name.to_s
       super(value)
       
       attrs.each do |(attr,val)|
@@ -124,11 +130,12 @@ def NamedValueClass(klass_name,superclass,&block)
     end
   EVAL
   
-  define_singleton_method klass_name do |name,value,attrs={}| 
+  define_singleton_method klass_name do |attrs={}| 
+    name, value = attrs.first
     begin
       klass.const_get(name) || klass.const_get("NameError_#{name}")
     rescue NameError #=> e
-      klass.new(name,value,attrs)
+      klass.new(attrs)
     end
   end
   

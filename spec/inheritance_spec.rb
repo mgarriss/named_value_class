@@ -1,32 +1,32 @@
 require 'helpers/helper'
 
-NamedValueClass 'Goo', String
-Goo 'B1', 'this'
+NamedValueClass Goo:String
+Goo B1:'this'
 
 class Ber < Goo; end
 
-Ber 'Z1', 'that'
-Ber 'Z2', 'those'
+Ber Z1:'that'
+Ber Z2:'those'
 
 module This
-  NamedValueClass 'Goo2', String
-  Goo2 'B1', 'this'
+  NamedValueClass Goo2:String
+  Goo2 B1:'this'
 
   class Ber2 < Goo2; end
   
-  Ber2 'Z1', 'that'
-  Ber2 'Z2', 'those'
+  Ber2 Z1:'that'
+  Ber2 Z2:'those'
 end
 
 module That
   module Those
-    NamedValueClass 'Goo3', String
-    Goo3 'B1', 'this'
+    NamedValueClass Goo3:String
+    Goo3 B1:'this'
 
     class Ber3 < Goo3; end
     
-    Ber3 'Z1', 'that'
-    Ber3 'Z2', 'those'
+    Ber3 Z1:'that'
+    Ber3 Z2:'those'
   end
 end
 
