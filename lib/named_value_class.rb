@@ -9,13 +9,21 @@ def NamedValueClass(klass_name,superclass,&block)
   klass.module_eval do
     def self.inherited(child)
       super
-      this = self
-      const_get(self.to_s.sub(/::.+/,'')).instance_eval do
-        define_method child.to_s do |name,value,attrs={}|
-          begin
-            const_get(name) || const_get("NameError_#{name}")
-          rescue NameError #=> e
-            child.new(name,value,attrs)
+      code = proc do |name,value,attrs={}|
+        begin
+          const_get(name) || const_get("NameError_#{name}")
+        rescue NameError #=> e
+          child.new(name,value,attrs)
+        end
+      end
+      if (mod = const_get(self.to_s.sub(/::.+$/,''))) == Kernel
+        mod.instance_eval do
+          define_method child.to_s.sub(/^.+::/,''), &code
+        end
+      else
+        mod.instance_eval do
+          module_eval do
+            define_singleton_method child.to_s.sub(/^.+::/,''), &code
           end
         end
       end
