@@ -1,12 +1,26 @@
 require 'delegate'
 
-def NamedValueClass(klass_name,superclass, &block)
+def NamedValueClass(klass_name,superclass,&block)
   target = (self.class == Object ? Kernel : self)
   
   target.module_eval "class #{klass_name} < DelegateClass(superclass); end"
   klass = target.const_get(klass_name)  
   
   klass.module_eval do
+    def self.inherited(child)
+      super
+      this = self
+      const_get(self.to_s.sub(/::.+/,'')).instance_eval do
+        define_method child.to_s do |name,value,attrs={}|
+          begin
+            const_get(name) || const_get("NameError_#{name}")
+          rescue NameError #=> e
+            child.new(name,value,attrs)
+          end
+        end
+      end
+    end
+  
     def initialize(name,value,attrs = {})
       @name = name.to_s
       super(value)
@@ -20,6 +34,7 @@ def NamedValueClass(klass_name,superclass, &block)
       
       named_values_module = self.class.const_get('NamedValues')
       named_values_collection = named_values_module.const_get('Collection')
+      
       begin
         self.class.const_set(@name, self)
         named_values_module.const_set(@name, self)
@@ -36,8 +51,13 @@ def NamedValueClass(klass_name,superclass, &block)
             end
           EVAL
           named_values_module.module_eval <<-EVAL
-            def self.#{@name}()
-              #{name_error_name}
+            module NameErrors
+              def self.#{@name}()
+                #{name_error_name}
+              end
+              def #{@name}()
+                #{name_error_name}
+              end
             end
             def #{@name}()
               #{name_error_name}
@@ -83,6 +103,14 @@ def NamedValueClass(klass_name,superclass, &block)
   klass.class_eval <<-EVAL
     module NamedValues
       Collection = []
+      def self.included(othermod)
+        othermod.class_eval do
+          extend NameErrors if defined? NameErrors
+        end
+        self.class_eval do
+          extend NameErrors if defined? NameErrors
+        end
+      end
     end
   EVAL
   

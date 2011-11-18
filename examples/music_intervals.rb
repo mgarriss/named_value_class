@@ -27,10 +27,9 @@ end
 
 class Scale
   include Music::Interval::NamedValues
-  extend  Music::Interval::NamedValues  # this sucks, still working in this 
 
   MinorScale = [P1,M2,m3,P4,P5,m6,m7]
   DorianMode = [P1,M2,m3,P4,P5,M6,m7]
 end
 
-puts Music::Interval[3] #=> m3
+Music::Interval[3] #=> m3

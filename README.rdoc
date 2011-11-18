@@ -46,6 +46,7 @@ Create two MathFloat constants and one Note constant.
     MathFloat 'Phi', 1.61803398874989
     
     Note 'A4', 440 # Hertz
+    Note 'A5', 880 # Hertz
   end
 
 Access the constants.
@@ -85,7 +86,7 @@ We can still get the original inspect and to_s methods.
 Get access to an Array of all created constants like so.
 
   MyApp::Note::NamedValues::Collection  #=> [A4]
-  
+
 Call added instance methods.
 
   MyApp::Note::A4.play_midi
@@ -142,14 +143,22 @@ have distinct meanings:
 A mapping from values back to named values is provided using [].
 
   Music::Interval[3] #=> m3
+  
+Supports inhertance like so:
+
+  module Music
+    class Chromatic < Interval; end
+    
+    Chromatic 'd3', 2
+  end
 
 You get the idea. Your homework: Scale should be a NamedValueClass. Scale::A
 and Scale::Am, etc.  
 
 == Issues
 
-* One must both include and extend NamedValues in order to get lowercase instances.
-* If you run into this error: "super from singleton method that is defined to multiple classes is not supported; this will be fixed in 1.9.3 or later" try declaring instances directly after the NamedValueClass call for each new type.  I'm still trying to track down a solution to this (unless 1.9.3 beats me).
+* If you run into this error: "super from singleton method that is defined to multiple classes is not supported; this will be fixed in 1.9.3 or later" try declaring instances directly after the NamedValueClass call for each new type.  I'm still trying to track down a solution to this (unless you or 1.9.3 beats
+me; I wouldn't be upset about this).
 
 == Author
 

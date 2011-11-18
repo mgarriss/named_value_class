@@ -11,16 +11,19 @@ end
 
 include MyApp::MathFloat::NamedValues
 
-# the following 2 output the constant's name and not the underlying value
-puts Pi                #=> Pi
-puts Phi               #=> Phi
 
-# the following 3 output a value because the results are regular Floats 
-puts Pi / 2            #=> 1.5707963267948966
-puts Phi / 2           #=> 0.809016994374945
-puts Pi + Phi          #=> 4.759626642339683
+# An IRB session with output after '#=>'
+#
+# The following output the constant's name and not the underlying value.
+Pi                #=> Pi
+Phi               #=> Phi
+
+# The following output a value because the results are regular Floats 
+Pi / 2            #=> 1.5707963267948966
+Phi / 2           #=> 0.809016994374945
+Pi + Phi          #=> 4.759626642339683
 
 # showing constant names here, note that is output is eval'able
-p [Pi, Phi]         #=> [Pi, Phi]
+[Pi, Phi]         #=> [Pi, Phi]
 
-puts Phi.value_inspect #=> "1.61803398874989"
+Phi.value_inspect #=> "1.61803398874989"
