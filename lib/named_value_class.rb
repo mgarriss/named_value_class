@@ -21,7 +21,9 @@ def NamedValueClass(klass_name,superclass,&block)
           define_method child.to_s.sub(/^.+::/,''), &code
         end
       else
-        mod.instance_eval do
+        to_s.split(/::/)[0..-2].inject(Kernel) do |m,e|
+          m.const_get(e)
+        end.instance_eval do
           module_eval do
             define_singleton_method child.to_s.sub(/^.+::/,''), &code
           end

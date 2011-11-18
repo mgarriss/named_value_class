@@ -44,8 +44,8 @@ describe 'inhertance' do
   end
 
   it 'creates a helper under double nested modules' do
-    That::Those::Goo2::B1.must_equal 'this'
-    That::Those::Ber2::Z1.must_equal 'that'
-    That::Those::Ber2::Z2.must_equal 'those'
+    That::Those::Goo3::B1.must_equal 'this'
+    That::Those::Ber3::Z1.must_equal 'that'
+    That::Those::Ber3::Z2.must_equal 'those'
   end
 end
