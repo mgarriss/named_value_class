@@ -36,3 +36,9 @@ class Scale
 end
 
 Music::Interval[3] #=> m3
+
+module Music
+  class Chromatic < Interval; end
+  
+  Chromatic d3:2
+end

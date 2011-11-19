@@ -30,6 +30,8 @@ end
 
 MyApp::MathFloat::Pi + MyApp::MathFloat::Phi
 
+# or
+
 include MyApp::MathFloat::NamedValues
 Pi + Phi
 
@@ -42,6 +44,8 @@ Pi + Phi          #=> 4.759626642339683
 
 3 / Pi            #=> 0.954929658551372
 2 / Phi           #=> 1.2360679774997934
+
+[Pi,Phi]          #=> [Pi,Phi]
 
 Phi.value_inspect #=> "1.61803398874989"
 Phi.value_to_s    #=> "1.61803398874989"
