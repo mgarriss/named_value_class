@@ -180,7 +180,7 @@ This gem was created out of a refactor of my music theroy calculator gem, {Peas}
 
 == Author
 
-* {Michael Garriss}[http://github.com/mgarriss] <mgarriss at gmail.com>
+* {Michael Garriss}[http://crooked-hideout.blogspot.com/] <mgarriss at gmail.com>
 
 == License
 
