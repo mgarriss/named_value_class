@@ -252,10 +252,10 @@ end
 
 describe '.(booleans)' do
   it 'is defined for classes with instances that set a parameters to true or false' do
-    Foo.primes.must_be_instance_of Array
-    Foo.evens.must_be_instance_of Array
+    Foo.primes.must_be_instance_of Hash
+    Foo.evens.must_be_instance_of Hash
     
-    Foo.primes.must_equal [Foo::F1]
-    Foo.evens.must_equal [Foo::ff,Foo::fff]
+    Foo.primes.must_equal({1=>Foo::F1})
+    Foo.evens.must_equal({36=>Foo::ff,16=>Foo::fff})
   end
 end

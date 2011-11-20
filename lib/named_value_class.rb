@@ -131,10 +131,10 @@ def NamedValueClass(attrs={},&block)
             booleans = begin
               const_get((attr.to_s+'s').upcase)
             rescue NameError
-              const_set((attr.to_s+'s').upcase, [])
+              const_set((attr.to_s+'s').upcase, {})
             end
             
-            booleans << this if val
+            booleans[value] = this if val
             
             self.class.instance_eval do
               define_method(attr.to_s + 's') do
