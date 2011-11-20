@@ -10,10 +10,14 @@ module NamedValueClass
   end
   
   def self.operate(klass, operator, rhs_class, lhs, default_policy, rhs)
-    rhs_class = rhs_class.sub(/^Kernel::/,'')
-    OPERATIONS[klass][rhs_class][operator].call(lhs,default_policy,rhs)
-  rescue NoMethodError
-    default_policy.call(rhs)
+    result = begin
+      rhs_class = rhs_class.sub(/^Kernel::/,'')
+      OPERATIONS[klass][rhs_class][operator].call(lhs,default_policy,rhs)
+    rescue NoMethodError
+      default_policy.call(rhs)
+    end
+    
+    lhs.class[result] or result
   end
 end
 

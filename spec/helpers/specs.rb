@@ -204,3 +204,26 @@ describe '.operation' do
     end
   end
 end
+
+describe 'returning a Mapping constant of lhs if possible' do
+  describe 'Foo::F2 - 1' do
+    it 'returns Foo::F1 and not 1' do
+      (Foo::F2 - 1).to_s.must_equal 'F1'
+    end
+  end
+  describe 'Foo::F2 - 0' do
+    it 'returns Foo::F2 and not 2' do
+      (Foo::F2 - 0).to_s.must_equal 'F2'
+    end
+  end
+  describe 'Foo::F1 + 1' do
+    it 'returns Foo::F2 and not 2' do
+      (Foo::F1 + 1).to_s.must_equal 'F2'
+    end
+  end
+  describe 'Foo::F1 + 0' do
+    it 'returns Foo::F1 and not 1' do
+      (Foo::F1 + 0).to_s.must_equal 'F1'
+    end
+  end
+end
