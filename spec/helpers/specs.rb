@@ -227,3 +227,16 @@ describe 'returning a Mapping constant of lhs if possible' do
     end
   end
 end
+
+describe 'constrain' do
+  it 'forces a Foo to be at least -10' do
+    (Foo::F1 - 1000).must_equal -10
+    (Foo::ff - 1000).must_equal -10
+  end
+  
+  it 'forces a Foo to be at most 50' do
+    (Foo::F2 + 1000).must_equal 50
+    (Foo::ff + Foo::ff).must_equal 50
+    (Foo::ff + 1000).must_equal 50
+  end
+end

@@ -1,4 +1,4 @@
-NamedValueClass Foo:Fixnum do
+NamedValueClass Foo:Fixnum, constrain:-10..50 do
   minus_a :Biz do |foo,minus,biz|
     minus biz
   end
@@ -45,7 +45,6 @@ NamedValueClass Biz:Float do
   end
   operation '-', Baz do |biz,minus,foo|
     # foo - biz
-    puts "#################################################################"
     'hella weird'
   end
 end

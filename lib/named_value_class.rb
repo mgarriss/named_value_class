@@ -1,4 +1,5 @@
 require 'delegate'
+require 'named_value_class/core_ext'
 
 module NamedValueClass
   OPERATIONS = {}
@@ -16,8 +17,8 @@ module NamedValueClass
     rescue NoMethodError
       default_policy.call(rhs)
     end
-    
-    lhs.class[result] or result
+    result = (result.constrain(lhs.lhs_constrain) rescue result)
+    lhs.class[result] || result
   end
 end
 
@@ -26,16 +27,22 @@ def NamedValueClass(attrs={},&block)
   klass_name, superclass = attrs.first
   attrs.delete(klass_name)
   
+  lhs_constrain = attrs.delete(:constrain)
+  
   target = (self.class == Object ? Kernel : self)
   
   target.module_eval "class #{klass_name} < DelegateClass(superclass); end"
   klass = target.const_get(klass_name)  
+
+  if superclass.ancestors.include?(Numeric) && lhs_constrain
+    klass.module_eval <<-EVAL
+      def lhs_constrain
+        #{lhs_constrain}
+      end
+    EVAL
+  end
   
   klass.module_eval do
-    self.define_singleton_method :delegated_class do
-      superclass
-    end
-    
     def self.inherited(child)
       super
       code = proc do |attrs={}|
