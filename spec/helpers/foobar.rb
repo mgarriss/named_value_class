@@ -12,11 +12,11 @@ NamedValueClass Foo:Fixnum, constrain:-10..50 do
   end
 end
 
-Foo F1:1
+Foo F1:1,   prime:true
 Foo F2:2
-Foo F1:3
-Foo ff:36
-Foo fff:16
+Foo F1:3,   prime:true
+Foo ff:36,  even:true
+Foo fff:16, prime:false, even:true
 
 class Bar
   include Foo::NamedValues

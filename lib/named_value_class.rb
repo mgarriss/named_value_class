@@ -122,10 +122,29 @@ def NamedValueClass(attrs={},&block)
       attrs.delete(@name)
       @name = @name.to_s
       super(@value = value)
-      
+
+      this = self
       attrs.each do |(attr,val)|
         self.class.instance_eval do
           attr_accessor attr
+          if [FalseClass,TrueClass].include?(val.class)
+            booleans = begin
+              const_get((attr.to_s+'s').upcase)
+            rescue NameError
+              const_set((attr.to_s+'s').upcase, [])
+            end
+            
+            booleans << this if val
+            
+            self.class.instance_eval do
+              define_method(attr.to_s + 's') do
+                const_get((attr.to_s+'s').upcase)
+              end
+            end
+            define_method "is_#{attr}?" do
+              self.send(attr)
+            end
+          end
         end
         instance_variable_set "@#{attr}", val 
       end

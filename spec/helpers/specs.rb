@@ -240,3 +240,22 @@ describe 'constrain' do
     (Foo::ff + 1000).must_equal 50
   end
 end
+
+describe '#is_(boolean)?' do
+  it 'is defined for instances that set a parameters to true or false' do
+    Foo::F1.is_prime?.must_equal true
+    Foo::F2.is_prime?.wont_equal true
+    Foo::ff.is_even?.must_equal true
+    Foo::fff.is_even?.must_equal true
+  end
+end
+
+describe '.(booleans)' do
+  it 'is defined for classes with instances that set a parameters to true or false' do
+    Foo.primes.must_be_instance_of Array
+    Foo.evens.must_be_instance_of Array
+    
+    Foo.primes.must_equal [Foo::F1]
+    Foo.evens.must_equal [Foo::ff,Foo::fff]
+  end
+end
