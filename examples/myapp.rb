@@ -13,17 +13,8 @@ module MyApp
     def play_midi
       # do something interesting here
     end
-    
-    # maybe define some special cases for subtraction
-    alias _minus :-
-    def -(rhs)
-      if rhs.is_a? String
-        "you jammin mon!"
-      else
-        self._minus(rhs)
-      end
-    end
   end
+  
   Note A4:440 # Hertz
   Note A5:880 # Hertz
 end

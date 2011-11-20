@@ -1,15 +1,37 @@
 require 'delegate'
 
+module NamedValueClass
+  OPERATIONS = {}
+  def self.operations(klass, operator, rhs_class, policy)
+    rhs_class = rhs_class.sub(/^Kernel::/,'')
+    OPERATIONS[klass] ||= {}
+    OPERATIONS[klass][rhs_class] ||= {}
+    OPERATIONS[klass][rhs_class][operator] = policy
+  end
+  
+  def self.operate(klass, operator, rhs_class, lhs, default_policy, rhs)
+    rhs_class = rhs_class.sub(/^Kernel::/,'')
+    OPERATIONS[klass][rhs_class][operator].call(lhs,default_policy,rhs)
+  rescue NoMethodError
+    default_policy.call(rhs)
+  end
+end
+
 # see README for documention
 def NamedValueClass(attrs={},&block)
   klass_name, superclass = attrs.first
   attrs.delete(klass_name)
+  
   target = (self.class == Object ? Kernel : self)
   
   target.module_eval "class #{klass_name} < DelegateClass(superclass); end"
   klass = target.const_get(klass_name)  
   
   klass.module_eval do
+    self.define_singleton_method :delegated_class do
+      superclass
+    end
+    
     def self.inherited(child)
       super
       code = proc do |attrs={}|
@@ -34,12 +56,61 @@ def NamedValueClass(attrs={},&block)
         end
       end
     end
+    
+    def self.operation operator, rhs_class, &policy
+      NamedValueClass.operations(self, operator, rhs_class.to_s, policy)
+    end
+    def self.plus_a         (rhs_class,&policy) operation '+', rhs_class, &policy end
+    def self.minus_a        (rhs_class,&policy) operation '-', rhs_class, &policy end
+    def self.divided_by_a   (rhs_class,&policy) operation '/', rhs_class, &policy end
+    def self.multiplied_by_a(rhs_class,&policy) operation '*', rhs_class, &policy end
+    def self.modulus_a      (rhs_class,&policy) operation '%', rhs_class, &policy end
+    def self.raised_by_a    (rhs_class,&policy) operation '**',rhs_class, &policy end
+      
+    # class << self
+    #   alias plus_an          plus_a
+    #   alias minus_an         minus_an
+    #   alias divided_by_an    divided_by_a
+    #   alias multiplied_by_an multiplied_by_a
+    #   alias modulus_an       modulus_a
+    #   alias raised_by_an     raised_by_a
+    # end
+    
+    {
+     _plus:  '+',
+     _minus: '-',
+     _multi: '*',
+     _divide:'/',
+     _mod:   '%',
+     _raise: '**'
+    }.each do |(name,orig)|
+      eval "alias #{name} #{orig}" rescue nil
+      define_method orig do |rhs|
+        NamedValueClass.operate(self.class,orig,rhs.class.to_s,
+                                self,method(name.to_sym),rhs)
+      end
+    end
+
+    # TODO: think about coerce more
+    # def coerce(lhs)
+    #   [lhs,self.value]
+    # end
+         
+    # def coerce(rhs)
+    #   class_eval do 
+    #     if @operations && @operations[rhs.class]
+    #       @operations[rhs.class].call(self,rhs)
+    #     end
+    #   end
+    # end
   
+    attr_reader :value
+    
     def initialize(attrs = {})
       @name, value = attrs.first
       attrs.delete(@name)
       @name = @name.to_s
-      super(value)
+      super(@value = value)
       
       attrs.each do |(attr,val)|
         self.class.instance_eval do
