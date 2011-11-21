@@ -259,3 +259,52 @@ describe '.(booleans)' do
     Foo.evens.must_equal({36=>Foo::ff,16=>Foo::fff})
   end
 end
+
+describe "operations '+', '-', '%' ...." do
+  it 'sets the same policy to all listed operators' do
+    (Biz1 +  Biz2).must_equal (Biz1 +  Biz1)
+    (Biz1 /  Biz2).must_equal (Biz1 /  Biz1)
+    (Biz1 ** Biz2).must_equal (Biz1 ** Biz1)
+    (Biz1 +  Biz2).must_equal (Biz1 +  Biz1)
+  end
+end
+
+describe NamedValueClass::Operators do
+  it 'is an Array containing all Operators' do
+    %w{+ - / * ** % | & ^ << >>}.each do |operator|
+      NamedValueClass::Operators.must_include operator
+    end
+  end
+end
+
+describe 'all_operators_with_a' do
+  it 'set the same policy for all operators with given class on rhs' do
+    NamedValueClass::Operators.each do |operator|
+      proc {eval "P1 #{operator} P2"}.must_raise SyntaxError
+    end
+  end
+end
+
+describe 'all_remaining_operators_with_a' do
+  it "sets all remaining undefined operators to the given policy" do
+    (P1 * R1).must_equal 'here'
+    (NamedValueClass::Operators - ['*']).each do |operator|
+      proc {eval "P1 #{operator} R1"}.must_raise SyntaxError
+    end
+  end
+end
+
+describe 'operation .... raise(s):Something' do
+  it 'sets a policy of always raising what ever class is provided' do
+    proc {Biz1 ** Foo::ff}.must_raise SyntaxError
+  end
+end
+
+describe 'operation .... return(s):Something' do
+  it 'returns the give object as the policy' do
+    NamedValueClass::Operators.each do |operator|
+      (eval "R1 #{operator} R2").must_equal 'Dude'
+    end
+  end
+end
+

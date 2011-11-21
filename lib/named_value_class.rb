@@ -3,6 +3,9 @@ require 'named_value_class/core_ext'
 
 module NamedValueClass
   OPERATIONS = {}
+  
+  Operators = %w{+ - / * ** % | & ^ << >>}
+  
   def self.operations(klass, operator, rhs_class, policy)
     rhs_class = rhs_class.sub(/^Kernel::/,'')
     OPERATIONS[klass] ||= {}
@@ -68,15 +71,29 @@ def NamedValueClass(attrs={},&block)
       end
     end
     
-    def self.operation operator, rhs_class, &policy
+    def self.all_operators_with_a *attrs
+    end
+    
+    def self.all_remaining_operators_with_a *attrs
+    end
+    
+    def self.operations *attrs, &block
+      policy = attrs.last if attrs.last.is_a?(Hash) 
+      attrs.each do |operator|
+        operation operator, policy, &policy
+      end
+    end
+    
+    def self.operation operator, rhs_class, attrs={}, &policy
       NamedValueClass.operations(self, operator, rhs_class.to_s, policy)
     end
-    def self.plus_a         (rhs_class,&policy) operation '+', rhs_class, &policy end
-    def self.minus_a        (rhs_class,&policy) operation '-', rhs_class, &policy end
-    def self.divided_by_a   (rhs_class,&policy) operation '/', rhs_class, &policy end
-    def self.multiplied_by_a(rhs_class,&policy) operation '*', rhs_class, &policy end
-    def self.modulus_a      (rhs_class,&policy) operation '%', rhs_class, &policy end
-    def self.raised_by_a    (rhs_class,&policy) operation '**',rhs_class, &policy end
+    
+    def self.plus_a         (*attrs,&policy) operation '+', *attrs, &policy end
+    def self.minus_a        (*attrs,&policy) operation '-', *attrs, &policy end
+    def self.divided_by_a   (*attrs,&policy) operation '/', *attrs, &policy end
+    def self.multiplied_by_a(*attrs,&policy) operation '*', *attrs, &policy end
+    def self.modulus_a      (*attrs,&policy) operation '%', *attrs, &policy end
+    def self.raised_by_a    (*attrs,&policy) operation '**',*attrs, &policy end
       
     # class << self
     #   alias plus_an          plus_a

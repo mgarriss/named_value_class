@@ -32,8 +32,11 @@ Baz b4:[2,1,3]
 
 NamedValueClass Biz:Float do
   operation '+', Foo do |biz,plus,foo|
-    plus foo
+    plus.call foo
   end
+  
+  operation '**', Foo, raises:SyntaxError
+  
   operation '+', String do |biz,_,string|
     string * biz
   end
@@ -47,8 +50,33 @@ NamedValueClass Biz:Float do
     # foo - biz
     'hella weird'
   end
+  operations '+', '/', '**', Biz do |lhs,op,rhs|
+    op.call lhs
+  end
 end
-Biz Biz1:1
-Biz Biz2:2
+Biz Biz1:1.0
+Biz Biz2:2.3
 
 include Biz::NamedValues
+
+NamedValueClass Pop:Fixnum do
+  all_operators_with_a Pop, raise:SyntaxError
+end
+Pop P1:1
+Pop P2:2
+
+include Pop::NamedValues
+
+NamedValueClass Rot:Fixnum do
+  multiplied_by_a Pop do
+    'here'
+  end
+  all_remaining_operators_with_a Pop, raise:SyntaxError
+  
+  divided_by_a Rot, raises:SyntaxError
+  all_operators_with_a Rot, return:'Dude'
+end
+Rot R1:1
+Rot R2:2
+
+include Pop::NamedValues
