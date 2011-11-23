@@ -1,4 +1,4 @@
-require 'helpers/helper'
+require 'helper'
 
 NamedValueClass Goo:String
 Goo B1:'this'

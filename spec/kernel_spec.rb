@@ -1,7 +1,7 @@
-require 'helpers/helper'
+require 'helper'
 require 'named_value_class'
 
-eval File.read('spec/helpers/foobar.rb')
+eval File.read('examples/foobar.rb')
 describe 'within kernel' do
   eval File.read('spec/helpers/specs.rb')
 end

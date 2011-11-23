@@ -1,4 +1,4 @@
-require 'helpers/helper'
+require 'helper'
 require 'named_value_class'
 
 Dir['examples/*.rb'].each do |example|
