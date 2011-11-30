@@ -1,4 +1,4 @@
-require 'helper'
+require 'spec_helper'
 require 'named_value_class'
 
 module Outer

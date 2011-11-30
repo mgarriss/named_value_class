@@ -7,7 +7,7 @@ require 'named_value_class/version'
 
 Rake::TestTask.new(:test) do |t|
   t.libs << "spec"
-  t.test_files = FileList["spec/**/*_spec.rb"] + FileList["spec/issues/*.rb"]
+  t.test_files = FileList["spec/**/*_spec.rb"] # + FileList["test/issues/*.rb"]
   t.verbose = true
 end
 

@@ -59,13 +59,13 @@
 
 # include Biz::NamedValues
 
-NamedValueClass Pop:Fixnum do
-  all_operators_with_a Pop, raise:SyntaxError
-end
-Pop P1:1
-Pop P2:2
+# NamedValueClass Pop:Fixnum do
+#   all_operators_with_a Pop, raise:SyntaxError
+# end
+# Pop P1:1
+# Pop P2:2
 
-include Pop::NamedValues
+# include Pop::NamedValues
 
 # NamedValueClass Rot:Fixnum do
 #   multiplied_by_a Pop do

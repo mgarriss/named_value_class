@@ -3,23 +3,24 @@ require 'named_value_class/core_ext'
 
 module NamedValueClass
   OPERATIONS = {}
+  OPERATORS = %w{+ - / * ** % | & ^ << >>}
   
-  Operators = %w{+ - / * ** % | & ^ << >>}
-  
-  def self.operations(klass, operator, rhs_class, policy)
+  def self.operators(klass, op, rhs_class, policy)
+    # puts "NamedValueClass.operators(#{klass}, #{op}, #{rhs_class}, #{policy})"
     rhs_class = rhs_class.sub(/^Kernel::/,'')
     OPERATIONS[klass] ||= {}
     OPERATIONS[klass][rhs_class] ||= {}
-    OPERATIONS[klass][rhs_class][operator] = policy
+    OPERATIONS[klass][rhs_class][op] = policy
   end
-  
-  def self.operate(klass, operator, rhs_class, lhs, default_policy, rhs)
-    result = begin
-      rhs_class = rhs_class.sub(/^Kernel::/,'')
-      OPERATIONS[klass][rhs_class][operator].call(lhs,default_policy,rhs)
-    rescue NoMethodError
-      default_policy.call(rhs)
-    end
+
+  def self.operate(klass, op, rhs_class, lhs, default_policy, rhs)
+    rhs_class = rhs_class.sub(/^Kernel::/,'')
+    # puts "OPERATIONS[#{klass.inspect}][#{rhs_class.inspect}][#{op.inspect}]"
+    # puts NamedValueClass::OPERATIONS
+    result = (OPERATIONS[klass] && OPERATIONS[klass][rhs_class] &&
+              OPERATIONS[klass][rhs_class][op]) ?
+             OPERATIONS[klass][rhs_class][op].call(lhs,default_policy,rhs) :
+             default_policy.call(rhs)
     result = (result.constrain(lhs.lhs_constrain) rescue result)
     lhs.class[result] || result
   end
@@ -29,11 +30,8 @@ end
 def NamedValueClass(attrs={},&block)
   klass_name, superclass = attrs.first
   attrs.delete(klass_name)
-  
   lhs_constrain = attrs.delete(:constrain)
-  
   target = (self.class == Object ? Kernel : self)
-  
   target.module_eval "class #{klass_name} < DelegateClass(superclass); end"
   klass = target.const_get(klass_name)  
 
@@ -72,38 +70,50 @@ def NamedValueClass(attrs={},&block)
     end
     
     def self.all_operators_with_a *attrs
+      # puts "#{self}.all_operators_with_a #{attrs}"
+      rhs_class = attrs.shift
+      operators *(NamedValueClass::OPERATORS + [rhs_class] + attrs)
     end
     
     def self.all_remaining_operators_with_a *attrs
     end
     
-    def self.operations *attrs, &block
-      policy = attrs.last if attrs.last.is_a?(Hash) 
-      attrs.each do |operator|
-        operation operator, policy, &policy
+    def self.operators *attrs, &block
+      # puts "#{self}.operators(#{attrs}, #{block})"
+      policy = attrs.pop if attrs.last.is_a?(Hash) 
+      with_a = attrs.pop
+      attrs.each do |op|
+        operator op, *([with_a, policy].compact), &block
       end
     end
     
-    def self.operation operator, rhs_class, attrs={}, &policy
-      NamedValueClass.operations(self, operator, rhs_class.to_s, policy)
+    def self.operator op, rhs_class, attrs={}, &policy
+      # puts "self.operator #{op}, #{rhs_class}, #{attrs}, #{policy}"
+      if value_to_return = (attrs[:return] || attrs[:returns])
+        policy = proc do |_,_,_|
+          value_to_return
+        end
+      end
+      if klass_to_raise = (attrs[:raise] || attrs[:raises])
+        policy = proc do |_,_,_|
+          raise klass_to_raise
+        end
+      end
+      # puts "value_to_return = #{value_to_return}, klass_to_raise = #{klass_to_raise}"
+      begin
+        # puts "policy.call(0,proc{|x|},0) ==> #{policy.call(0,proc{|x|},0)}"
+      rescue SyntaxError
+      end
+      NamedValueClass.operators(self, op, rhs_class.to_s, policy)
     end
-    
-    def self.plus_a         (*attrs,&policy) operation '+', *attrs, &policy end
-    def self.minus_a        (*attrs,&policy) operation '-', *attrs, &policy end
-    def self.divided_by_a   (*attrs,&policy) operation '/', *attrs, &policy end
-    def self.multiplied_by_a(*attrs,&policy) operation '*', *attrs, &policy end
-    def self.modulus_a      (*attrs,&policy) operation '%', *attrs, &policy end
-    def self.raised_by_a    (*attrs,&policy) operation '**',*attrs, &policy end
+
+    def self.plus_a         (*attrs,&policy) operator '+', *attrs, &policy end
+    def self.minus_a        (*attrs,&policy) operator '-', *attrs, &policy end
+    def self.divided_by_a   (*attrs,&policy) operator '/', *attrs, &policy end
+    def self.multiplied_by_a(*attrs,&policy) operator '*', *attrs, &policy end
+    def self.modulus_a      (*attrs,&policy) operator '%', *attrs, &policy end
+    def self.raised_by_a    (*attrs,&policy) operator '**',*attrs, &policy end
       
-    # class << self
-    #   alias plus_an          plus_a
-    #   alias minus_an         minus_an
-    #   alias divided_by_an    divided_by_a
-    #   alias multiplied_by_an multiplied_by_a
-    #   alias modulus_an       modulus_a
-    #   alias raised_by_an     raised_by_a
-    # end
-    
     {
      _plus:  '+',
      _minus: '-',
@@ -126,8 +136,8 @@ def NamedValueClass(attrs={},&block)
          
     # def coerce(rhs)
     #   class_eval do 
-    #     if @operations && @operations[rhs.class]
-    #       @operations[rhs.class].call(self,rhs)
+    #     if @operators && @operators[rhs.class]
+    #       @operators[rhs.class].call(self,rhs)
     #     end
     #   end
     # end
