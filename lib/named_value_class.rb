@@ -3,7 +3,8 @@ require 'named_value_class/core_ext'
 
 module NamedValueClass
   OPERATIONS = {}
-  OPERATORS = %w{+ - / * ** % | & ^ << >>}
+  # OPERATORS = %w{+ - / * ** % | & ^ << >>}
+  OPERATORS = %w{+ - / * **} #% | & ^ << >>}
   
   def self.operators(klass, op, rhs_class, policy)
     # puts "NamedValueClass.operators(#{klass}, #{op}, #{rhs_class}, #{policy})"
@@ -113,7 +114,7 @@ def NamedValueClass(attrs={},&block)
     def self.multiplied_by_a(*attrs,&policy) operator '*', *attrs, &policy end
     def self.modulus_a      (*attrs,&policy) operator '%', *attrs, &policy end
     def self.raised_by_a    (*attrs,&policy) operator '**',*attrs, &policy end
-      
+
     {
      _plus:  '+',
      _minus: '-',
