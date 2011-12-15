@@ -140,28 +140,6 @@ describe 'NamedValueClass additional attributes' do
   end
 end
 
-# describe 'constant:true' do
-#   %w[= += -= *= /= **= %= |= ^= &= <<= >>= &&= ||=].each do |op|
-#     describe op.to_s do
-#       it 'raises SyntaxError' do
-#         skip "can't overload assignment; will these ever pass? don't do Foo::ff #{op} 1"
-#         proc do
-#           eval "Foo::F1 #{op} 4"
-#         end.must_raise SyntaxError
-#         proc do
-#           eval "Foo::F1 #{op} Foo::F2"
-#         end.must_raise SyntaxError
-#         proc do
-#           eval "Biz1 #{op} Foo::F2"
-#         end.must_raise SyntaxError
-#         proc do
-#           eval "Foo::ff #{op} 4"
-#         end.must_raise SyntaxError
-#       end
-#     end
-#   end
-# end
-
 describe '.operation' do
   it 'accepts a symbol for rhs name' do
     (Foo::F1 - Biz::Biz1).must_equal 0
@@ -195,14 +173,13 @@ describe '.operation' do
       (Biz::Biz2 - Biz::Biz1).must_equal "just odd"
     end
   end
-  # describe 'Biz - Foo' do
-  #   it 'performs a Foo - Biz' do
-  #     skip "still scratching my head why the policy closure is never called..."
-  #     (Biz::Biz1 - Foo::F1).must_equal 0
-  #     (Biz::Biz1 - Foo::F2).must_equal 1
-  #     (Biz::Biz2 - Foo::ff).must_equal 34
-  #   end
-  # end
+  describe 'Biz - Foo' do
+    it 'performs a Foo - Biz' do
+      (Biz::Biz1 - Foo::F1).must_equal 0
+      (Biz::Biz1 - Foo::F2).must_equal 1
+      (Biz::Biz2 - Foo::ff).must_equal 34
+    end
+  end
 end
 
 describe 'returning a Mapping constant of lhs if possible' do
@@ -297,7 +274,7 @@ end
 
 describe 'operation .... raise(s):Something' do
   it 'sets a policy of always raising what ever class is provided' do           
-    # proc {Biz1 ** Foo::ff}.must_raise SyntaxError
+    proc {Biz1 ** Foo::ff}.must_raise SyntaxError
   end
 end
 
