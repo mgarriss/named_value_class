@@ -4,7 +4,7 @@ require 'named_value_class/core_ext'
 module NamedValueClass
   OPERATIONS = {}
   # OPERATORS = %w{+ - / * ** % | & ^ << >>}
-  OPERATORS = %w{+ - / * **}
+  OPERATORS = %w{+ - / *} # **}
   
   def self.operators(klass, op, rhs_class, policy)
     rhs_class = rhs_class.sub(/^Kernel::/,'')
