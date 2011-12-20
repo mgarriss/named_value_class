@@ -3,6 +3,8 @@
 Quickly add customizable class delegate constants which output their names,
 not their values.  This may be desirable for some DSLs.
 
+Please ask questions or scold me about this {here}[http://crooked-hideout.blogspot.com/2011/12/namedvalueclass-07-released.html].
+
 == Features
 
 * Creates a class for constants that delegate most work to the stable and efficient ruby core classes.
