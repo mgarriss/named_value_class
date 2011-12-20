@@ -2,10 +2,6 @@ $:.unshift File.join( File.dirname( __FILE__ ), '../lib')
 
 require "named_value_class"
 
-# Use lowercase names.  Before you complain, please consider the standard
-# abbreviations for the Diatonic Interval names in music theory.  'm' and 'M'
-# have distinct meanings:
-
 module Music
   NamedValueClass Interval:Fixnum
 

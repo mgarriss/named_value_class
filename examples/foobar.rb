@@ -1,3 +1,5 @@
+$:.unshift File.join( File.dirname( __FILE__ ), '../lib')
+
 require 'named_value_class'
 
 NamedValueClass Foo:Fixnum, constrain:-10..50 do

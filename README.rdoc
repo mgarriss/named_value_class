@@ -7,176 +7,97 @@ not their values.  This may be desirable for some DSLs.
 
 * Creates a class for constants that delegate most work to the stable and efficient ruby core classes.
 * #to_s and #inspect output is the constant's name and not it's value.
-* Output is eval'able.
 * Allows for lowercase constant names.
-* Provides a module for each new class to include all defined values into some other namespace.
+* Generates helper methods to access constants based on the parameters set when creating the constants.
 * Provides a mapping from value back to constant.
-* Only dependancy is the wonderful 'delegate' library which is already in the ruby stdlib so... really no dependancies.
+* Provides helpers for defining special math/operator rules. 
+* Only dependency is the 'delegate' library which is already in the ruby stdlib so... really no dependancies.
 
 == Installation
 
   gem install named_value_class
   
-== Requirements
+== Rg operators the blocks are always yieled: the LHS (left hand side), a proc with the original, default implementation of the operator you are redefining, and the RHS.  The passed proc's receiver is the LHS so in the following code "minus.call(rhs)" performs "lhs - rhs".  
 
-* Ruby 1.9.2 (named arguments, and maintained insertion order hashes)
+      result = minus(rhs) % 12
 
-== Usage
+Since we plan on setting boolean parameters named 'sharp' and 'flat' when we define Pitch constants later we can use methods is_sharp?, is_flat?, Pitch.sharps(value) and Pitch.flats(value):
 
-  require "named_value_class"
-
-Create a new class named MathFloat that delegates to Float and one named
-Note that delegates to Fixnum.  The Note class has an instance method
-added called #play_midi and redefines how substraction works. Create two
-MathFloat constants and one Note constant.  
-
-  module MyApp
-    NamedValueClass MathFloat:Float
-    
-    MathFloat Pi: 3.14159265358979323846
-    MathFloat Phi:1.61803398874989
-    
-
-    NamedValueClass Note:Fixnum do
-      # this is eval'd in Note's class scope
-
-      attr_reader :some_var
-
-      def play_midi
-        # do something interesting here
-      end
-      
-      # maybe define some special cases for subtraction
-      alias _minus :-
-      def -(rhs)
-        if rhs.is_a? String
-          "you jammin mon!"
-        else
-          self._minus(rhs)
-        end
-      end
+      is_sharp? ? Pitch.sharps(result) : Pitch.flats(result)
     end
     
-    Note A4:440 # Hertz
-    Note A5:880 # Hertz
-  end
+It doesn't make any sense to do math with a Pitch on the left and right sides so all operators should raise a SyntaxError.  Examples: Ds + C, Eb / A
 
-Access the constants.
+    all_operators_with_a :Pitch, raise:SyntaxError
 
-  MyApp::MathFloat::Pi + MyApp::MathFloat::Phi
-  
-  # or
-  
-  include MyApp::MathFloat::NamedValues
-  Pi + Phi
+Define some instance methods:    
 
-All constants created in the above way can be included anywhere using the
-NamedValues module defined within the new class created by NamedValueClass().
-
-The following output the constant's name and not the underlying value.
-
-  Pi                #=> Pi
-  Phi               #=> Phi
-
-Treat the defined value as the type they delegate to.  The following output a value because the results are regular Floats.
-
-  Pi / 2            #=> 1.5707963267948966
-  Phi / 2           #=> 0.809016994374945
-  Pi + Phi          #=> 4.759626642339683
-  
-Use them on left hand or right hand side.
-
-  3 / Pi            #=> 0.954929658551372
-  2 / Phi           #=> 1.2360679774997934
-
-Just showing constant names here, note that this output is eval'able.
-
-  [Pi, Phi]         #=> [Pi, Phi]
-
-We can still get the original inspect and to_s methods.
-
-  Phi.value_inspect #=> "1.61803398874989"
-  Phi.value_to_s    #=> "1.61803398874989"
-  
-Get access to an Array of all created constants like so.
-
-  MyApp::Note::NamedValues::Collection  #=> [A4]
-
-Call added instance methods.
-
-  MyApp::Note::A4.play_midi
-
-Everything works at the global scope.
-
-  NamedValueClass Foobar:Array
-  Foobar B1:[1,2]
-
-Additional attribues can be added to any instance.
-
-  Foobar B2:[],    some_param:'dude2', foo:5, bar:89
-  Foobar B3:[2,1], foo:99
-  Foobar B4:[2,1], bar:9.3
-  
-All instances will have setters and getters for any named parameter given.
-
-  Foobar::B2.some_param                    #=> 'dude2'
-  Foobar::B2.some_param = 'kind of cool'
-  Foobar::B2.some_param                    #=> 'kind of cool'
-
-Use lowercase names.  Before you complain, please consider the standard
-abbreviations for the Diatonic Interval names in music theory.  'm' and 'M'
-have distinct meanings:
-
-  module Music
-    NamedValueClass Interval:Fixnum
-
-    Interval P1: 0   # value is number of semitones
-    Interval m2: 1
-    Interval M2: 2
-    Interval m3: 3
-    Interval M3: 4
-    Interval P4: 5
-    Interval A4: 6
-    Interval d5: 6
-    Interval P5: 7
-    Interval m6: 8
-    Interval M6: 9
-    Interval m7:10
-    Interval M7:11
-    Interval P8:12
-  end
-  
-  class Scale
-    include Music::Interval::NamedValues
-
-    MinorScale = [P1,M2,m3,P4,P5,m6,m7]
-    DorianMode = [P1,M2,m3,P4,P5,M6,m7]
-  end
-  
-A mapping from values back to named values is provided using [].
-
-  Music::Interval[3] #=> m3
-  
-Supports inhertance like so:
-
-  module Music
-    class Chromatic < Interval; end
+    def as_flat
+      self.class.naturals[self] || self.class.flats[self]
+    end
     
-    Chromatic d3:2
+    def as_sharp
+      self.class.naturals[self] || self.class.sharps[self]
+    end
   end
 
-You get the idea. Your homework: Scale should be a NamedValueClass. Scale::A
-and Scale::Am, etc.  
+Now create Pitch constants:  
 
+  Pitch Bs:  0,   sharp:true  
+  Pitch C:   0, natural:true 
+  Pitch Cs:  1,   sharp:true 
+  Pitch Db:  1,    flat:true 
+  Pitch D:   2, natural:true 
+  Pitch Ds:  3,   sharp:true 
+  Pitch Eb:  3,    flat:true 
+  Pitch E:   4, natural:true 
+  Pitch Fb:  4,    flat:true 
+  Pitch Es:  5,   sharp:true 
+  Pitch F:   5, natural:true 
+  Pitch Fs:  6,   sharp:true 
+  Pitch Gb:  6,    flat:true 
+  Pitch G:   7, natural:true 
+  Pitch Gs:  8,   sharp:true 
+  Pitch Ab:  8,    flat:true 
+  Pitch A:   9, natural:true 
+  Pitch As: 10,   sharp:true 
+  Pitch Bb: 10,    flat:true 
+  Pitch B:  11, natural:true 
+  Pitch Cb: 11,    flat:true
+
+An irb session with the above code loaded:
+
+  ~/d/m/n/examples irb
+  >> load "./pitch_class.rb" #=> true
+  >> include Pitch::NamedValues #=> Object
+  >> B #=> B
+  >> C #=> C
+  >> C.value #=> 0
+  >> Eb.value #=> 3
+  >> C + 2 #=> D
+  >> Eb - 4 #=> Bs
+  >> [C,Eb] #=> [C, Eb]
+  >> C > Eb #=> false
+  >> Pitch.flats #=> {1=>Db, 3=>Eb, 4=>Fb, 6=>Gb, 8=>Ab, 10=>Bb, 11=>Cb}
+  >> Pitch.sharps #=> {0=>Bs, 1=>Cs, 3=>Ds, 5=>Es, 6=>Fs, 8=>Gs, 10=>As}
+  >> C.is_sharp? #=> nil
+  >> C.is_flat? #=> nil
+  >> C.is_natural? #=> true
+  >> Pitch H:0, insane:true #=> H
+  >> H #=> H
+  >> C.is_insane? #=> nil
+  >> H.is_insane? #=> true
+  >> Pitch.insanes #=> {0=>H}
+  
 == Thoughts
 
-I'll still not settled on a best practice for coercion, so it remains missing. from the helpers and specs.  You can of course just write a coerce method for any named value class you create.
+I'm still not settled on a best practice for coercion, so it remains missing. from the helpers and specs.  You can of course just write a coerce method for any named value class you create.
 
-This gem was created out of a refactor of my music theroy calculator gem, {Peas}[http://github.com/mgarriss/peas/blob/master/examples/].  It greatly reduced the code clutter of that gem.  I'd say it reduced the number lines by half at least.
+This gem was created out of a re-factor of my music theory calculator gem, {Peas}[http://github.com/mgarriss/peas/blob/master/].  It greatly reduced the code clutter of that gem.  I'd say it reduced the number lines by half at least.
 
 == Issues
 
-* If you run into this error: "super from singleton method that is defined to multiple classes is not supported; this will be fixed in 1.9.3 or later" you should know the ruby is producing this message, not me.  Try declaring instances directly after the NamedValueClass call for each new type.  I'm still trying to accurately repoduce this problem in specs and a solution evades me currently. This is crazy annoying and makes the gem far less useful at the moment.  I delclare that it will be solved before v1.0.  Free beer for whoever can finish either of the above tasks before me.
+* If you run into this error: "super from singleton method that is defined to multiple classes is not supported; this will be fixed in 1.9.3 or later" you should know the ruby is producing this message, not me.  Try declaring instances directly after the NamedValueClass call for each new type.  I'm still trying to accurately repoduce this problem in specs and a solution evades me currently. This is crazy annoying and makes the gem far less useful at the moment.  I declare that it will be solved before v1.0.  Free beer for whoever can finish either of the above tasks before me.
 
 == Author
 
