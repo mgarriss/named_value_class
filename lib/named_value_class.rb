@@ -7,7 +7,6 @@ module NamedValueClass
   OPERATORS = %w{+ - / * **}
   
   def self.operators(klass, op, rhs_class, policy)
-    # puts "NamedValueClass.operators(#{klass}, #{op}, #{rhs_class}, #{policy})"
     rhs_class = rhs_class.sub(/^Kernel::/,'')
     OPERATIONS[klass] ||= {}
     OPERATIONS[klass][rhs_class] ||= {}
@@ -16,8 +15,6 @@ module NamedValueClass
 
   def self.operate(klass, op, rhs_class, lhs, default_policy, rhs)
     rhs_class = rhs_class.sub(/^Kernel::/,'')
-    # puts "OPERATIONS[#{klass.inspect}][#{rhs_class.inspect}][#{op.inspect}]"
-    # puts NamedValueClass::OPERATIONS
     result = (OPERATIONS[klass] && OPERATIONS[klass][rhs_class] &&
               OPERATIONS[klass][rhs_class][op]) ?
              OPERATIONS[klass][rhs_class][op].call(lhs,default_policy,rhs) :
@@ -71,7 +68,6 @@ def NamedValueClass(attrs={},&block)
     end
     
     def self.all_operators_with_a *attrs
-      # puts "#{self}.all_operators_with_a #{attrs}"
       rhs_class = attrs.shift
       operators *(NamedValueClass::OPERATORS + [rhs_class] + attrs)
     end
@@ -80,7 +76,6 @@ def NamedValueClass(attrs={},&block)
     end
     
     def self.operators *attrs, &block
-      # puts "#{self}.operators(#{attrs}, #{block})"
       policy = attrs.pop if attrs.last.is_a?(Hash) 
       with_a = attrs.pop
       attrs.each do |op|
@@ -89,7 +84,6 @@ def NamedValueClass(attrs={},&block)
     end
     
     def self.operator op, rhs_class, attrs={}, &policy
-      # puts "self.operator #{op}, #{rhs_class}, #{attrs}, #{policy}"
       if value_to_return = (attrs[:return] || attrs[:returns])
         policy = proc do |_,_,_|
           value_to_return
@@ -99,11 +93,6 @@ def NamedValueClass(attrs={},&block)
         policy = proc do |_,_,_|
           raise klass_to_raise
         end
-      end
-      # puts "value_to_return = #{value_to_return}, klass_to_raise = #{klass_to_raise}"
-      begin
-        # puts "policy.call(0,proc{|x|},0) ==> #{policy.call(0,proc{|x|},0)}"
-      rescue SyntaxError
       end
       NamedValueClass.operators(self, op, rhs_class.to_s, policy)
     end
