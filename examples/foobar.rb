@@ -1,3 +1,5 @@
+require 'named_value_class'
+
 NamedValueClass Foo:Fixnum, constrain:-10..50 do
   minus_a :Biz do |foo,minus,biz|
     minus.call biz
@@ -73,8 +75,8 @@ NamedValueClass Rot:Fixnum do
   end
   all_remaining_operators_with_a Pop, raise:SyntaxError
   
-  divided_by_a Rot, raises:SyntaxError
-  all_operators_with_a Rot, return:'Dude'
+  divided_by_a 'Rot', raises:SyntaxError
+  all_operators_with_a 'Rot', return:'Dude'
 end
 Rot R1:1
 Rot R2:2
