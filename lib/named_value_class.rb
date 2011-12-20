@@ -3,8 +3,7 @@ require 'named_value_class/core_ext'
 
 module NamedValueClass
   OPERATIONS = {}
-  # OPERATORS = %w{+ - / * ** % | & ^ << >>}
-  OPERATORS = %w{+ - / *} # **}
+  OPERATORS = %w{+ - / *}
   
   def self.operators(klass, op, rhs_class, policy)
     rhs_class = rhs_class.sub(/^Kernel::/,'')
@@ -101,16 +100,12 @@ def NamedValueClass(attrs={},&block)
     def self.minus_a        (*attrs,&policy) operator '-', *attrs, &policy end
     def self.divided_by_a   (*attrs,&policy) operator '/', *attrs, &policy end
     def self.multiplied_by_a(*attrs,&policy) operator '*', *attrs, &policy end
-    def self.modulus_a      (*attrs,&policy) operator '%', *attrs, &policy end
-    def self.raised_by_a    (*attrs,&policy) operator '**',*attrs, &policy end
 
     {
      _plus:  '+',
      _minus: '-',
      _multi: '*',
      _divide:'/',
-     _mod:   '%',
-     _raise: '**'
     }.each do |(name,orig)|
       eval "alias #{name} #{orig}" rescue nil
       define_method orig do |rhs|
@@ -119,19 +114,6 @@ def NamedValueClass(attrs={},&block)
       end
     end
 
-    # TODO: think about coerce more
-    # def coerce(lhs)
-    #   [lhs,self.value]
-    # end
-         
-    # def coerce(rhs)
-    #   class_eval do 
-    #     if @operators && @operators[rhs.class]
-    #       @operators[rhs.class].call(self,rhs)
-    #     end
-    #   end
-    # end
-  
     attr_reader :value
     
     def initialize(attrs = {})
